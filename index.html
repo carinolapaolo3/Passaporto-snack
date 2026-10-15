@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1a38">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Passaporto">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Passaporto del Gusto</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+:root{--navy:#10244a;--navy2:#1f3f78;--gold:#e0b84f;--paper:#efeadc;--ink:#1d2433;--stamp:#c0392b;--mute:#6d7385}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{font-family:'Bricolage Grotesque',system-ui,sans-serif;background:radial-gradient(circle at 50% 0,#24457f,#0b1a38 70%);color:#fff;display:flex;flex-direction:column;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+button{font:inherit;cursor:pointer;border:0}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 4px}
+header h1{font-size:17px;margin:0;color:var(--gold);letter-spacing:.3px}
+.hb{display:flex;gap:6px}
+.ib{background:#ffffff1a;color:#fff;border-radius:10px;padding:8px 11px;font-size:13px;font-weight:600}
+.ib.gold{background:var(--gold);color:#241b00}
+.bar{display:flex;gap:8px;padding:6px 14px}
+.bar input,.bar select{flex:1;min-width:0;background:#ffffff14;border:1px solid #ffffff26;color:#fff;border-radius:10px;padding:9px 11px;font:inherit;font-size:14px}
+.bar select{flex:0 0 38%}.bar option{color:#000}
+.bar input::placeholder{color:#ffffff88}
+.stage{flex:1;display:flex;padding:8px 14px;min-height:0}
+.book{position:relative;width:min(100%,430px);height:100%;max-height:680px;margin:auto;perspective:1900px}
+.leaf{position:absolute;inset:0;transform-origin:left center;transition:transform .85s cubic-bezier(.45,.05,.25,1),opacity .15s;border-radius:4px 16px 16px 4px;background:var(--paper);color:var(--ink);box-shadow:0 14px 30px #0008,inset 10px 0 14px -8px #0005;overflow:hidden;backface-visibility:hidden}
+.leaf::before{content:"";position:absolute;inset:0 auto 0 0;width:14px;background:linear-gradient(90deg,#0003,transparent);z-index:3;pointer-events:none}
+.leaf.fl{transform:rotateY(-118deg);opacity:0;pointer-events:none;transition:transform .85s cubic-bezier(.45,.05,.25,1),opacity .2s .6s;box-shadow:0 0 50px #0009}
+.noanim .leaf{transition:none!important}
+.inner{height:100%;overflow-y:auto;padding:18px 18px 16px 28px}
+.cover{background:linear-gradient(150deg,var(--navy2),var(--navy));color:#fff;border:2px solid #0006}
+.cover .inner{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;border:2px solid var(--gold);margin:14px 14px 14px 22px;height:calc(100% - 28px);border-radius:10px;padding:16px}
+.cover h2{font-size:38px;line-height:1;margin:6px 0 0;color:var(--gold);font-weight:800;text-shadow:0 2px 0 #0007}
+.cover .globe{font-size:58px;filter:drop-shadow(0 3px 4px #0006)}
+.cover p{margin:0;color:#cfd8ee;font-size:14px}
+.cs{display:flex;gap:18px;margin-top:10px}
+.cs div{font-size:12px;color:#cfd8ee}.cs b{display:block;font-size:26px;color:#fff}
+.hint{margin-top:12px!important;color:var(--gold)!important;font-weight:700}
+.ph{position:relative;background:#fff;padding:8px 8px 26px;box-shadow:0 3px 10px #0003;transform:rotate(-1.6deg);margin:4px 4px 16px}
+.ph img,.ph .no{width:100%;height:210px;object-fit:cover;display:block;background:#dfe3ea}
+.ph .no{display:flex;align-items:center;justify-content:center;font-size:60px}
+.ph::before{content:"";position:absolute;top:-10px;left:50%;width:84px;height:22px;background:#e0b84f99;transform:translateX(-50%) rotate(2deg)}
+.stamp{position:absolute;right:-8px;bottom:-14px;transform:rotate(9deg);border:3px double var(--stamp);color:var(--stamp);border-radius:8px;padding:5px 10px;font-weight:800;font-size:14px;background:#fff9;max-width:70%;text-align:center}
+.brand{font-size:12px;color:var(--mute);font-weight:700;margin:0}
+.leaf h3{font-size:24px;line-height:1.1;margin:2px 0 6px;font-weight:800}
+.st{color:#d79a00;font-size:20px;letter-spacing:2px}.st i{font-style:normal;color:#cfc9b6}
+.meta{font-size:13px;color:#454c5e;margin:8px 0;display:grid;gap:3px}
+.note{font-family:Caveat,cursive;font-size:22px;line-height:1.15;color:#233a73;background:repeating-linear-gradient(transparent 0 25px,#9db1d855 25px 26px);padding:2px 4px;margin:10px 0}
+.bc{font-size:12px;color:var(--mute);letter-spacing:1px}
+.act{display:flex;gap:8px;margin-top:12px}
+.act button{flex:1;padding:9px;border-radius:10px;font-weight:700;background:#1d243314;color:var(--ink)}
+.act .d{color:var(--stamp)}
+.addp{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;text-align:center;padding:20px}
+.addp button{width:92px;height:92px;border-radius:50%;background:var(--navy2);color:var(--gold);font-size:50px;box-shadow:0 6px 0 var(--navy)}
+.nav{display:flex;align-items:center;justify-content:center;gap:14px;padding:6px 14px 12px}
+.nav button{width:50px;height:42px;border-radius:12px;background:#ffffff1f;color:#fff;font-size:22px}
+.nav button:disabled{opacity:.3}
+#ind{min-width:110px;text-align:center;font-weight:700;color:var(--gold);font-size:14px}
+.modal{position:fixed;inset:0;background:#000b;display:none;align-items:flex-end;justify-content:center;z-index:50}
+.modal.on{display:flex}
+.sheet{background:#f6f2e7;color:var(--ink);width:100%;max-width:480px;max-height:93dvh;overflow:auto;border-radius:20px 20px 0 0;padding:16px 16px 22px}
+.sheet h4{margin:0 0 10px;font-size:19px}
+.sheet label{display:block;font-size:12px;font-weight:700;color:var(--mute);margin:10px 0 4px}
+.sheet input,.sheet textarea{width:100%;background:#fff;border:1px solid #c9c3b0;border-radius:10px;padding:10px;font:inherit;font-size:15px;color:var(--ink)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.btn{padding:11px 14px;border-radius:11px;font-weight:700;background:var(--navy2);color:#fff}
+.btn.g{background:#1d243314;color:var(--ink)}
+.scanbox{background:#e6e1d0;border-radius:12px;padding:10px;margin-bottom:6px}
+#bst{font-size:13px;margin:6px 0 0;color:#2f6b3f}
+.stars button{background:none;font-size:32px;color:#cfc9b6;padding:0 4px}.stars button.on{color:#d79a00}
+#res{display:grid;gap:6px;margin-top:8px}#res button{display:flex;gap:10px;align-items:center;text-align:left;background:#fff;border:1px solid #c9c3b0;border-radius:10px;padding:6px;color:var(--ink);font:inherit;font-size:14px}#res img{width:44px;height:44px;object-fit:cover;border-radius:6px;background:#dfe3ea;flex:none}#res small{color:var(--mute);display:block;font-size:12px}
+#prev{width:100%;max-height:170px;object-fit:cover;border-radius:10px;margin-top:8px;display:none}
+#reader{width:100%;border-radius:12px;overflow:hidden}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:99;max-width:86vw;text-align:center}
+#toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.leaf{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🛂 Passaporto del Gusto</h1>
+  <div class="hb">
+    <button class="ib" id="bk">Backup</button>
+    <button class="ib gold" id="addtop">+ Nuovo</button>
+  </div>
+</header>
+<div class="bar">
+  <input id="q" type="search" placeholder="Cerca nome, marca, codice…">
+  <select id="fc"><option value="">Tutti i paesi</option></select>
+</div>
+<div class="stage" id="stage"><div class="book" id="book"></div></div>
+<div class="nav"><button id="pv">‹</button><div id="ind"></div><button id="nx">›</button></div>
+
+<!-- Form prodotto -->
+<div class="modal" id="m-form"><div class="sheet">
+  <h4 id="ft">Nuovo prodotto</h4>
+  <div class="scanbox">
+    <label style="margin-top:0">Codice a barre</label>
+    <input id="bc" inputmode="numeric" placeholder="Es. 4902777008592">
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="scan" type="button">📷 Scansiona</button>
+      <button class="btn" id="look" type="button">🔎 Cerca</button>
+    </div>
+    <p id="bst"></p>
+    <button class="btn g" id="key" type="button" style="margin-top:6px;padding:7px 10px;font-size:12px">🔑 Chiave EAN-Search</button>
+  </div>
+  <label>Nome *</label><div class="row"><input id="nm" style="flex:3"><button class="btn" id="byname" type="button" style="flex:1.3;padding:8px">🔤 Cerca</button></div><div id="res"></div>
+  <div class="row"><div><label>Marca</label><input id="br"></div><div><label>Paese *</label><input id="co"></div></div>
+  <div class="row"><div><label>Comprato dove</label><input id="sr"></div><div><label>Data</label><input id="dt" type="date"></div></div>
+  <label>Voto</label><div class="stars" id="stars"></div>
+  <label>Foto</label><input id="pf" type="file" accept="image/*"><img id="prev" alt="">
+  <label>Note</label><textarea id="nt" rows="3" placeholder="Com'era? Piccante, croccante, stomaco felice?"></textarea>
+  <div class="row" style="margin-top:16px"><button class="btn g" id="fx" type="button">Annulla</button><button class="btn" id="fs" type="button">Salva</button></div>
+</div></div>
+
+<!-- Scanner -->
+<div class="modal" id="m-scan" style="align-items:center"><div class="sheet" style="border-radius:20px;margin:14px">
+  <h4>Inquadra il codice a barre</h4><div id="reader"></div>
+  <button class="btn g" id="sx" style="width:100%;margin-top:12px">Chiudi</button>
+</div></div>
+
+<div id="toast"></div>
+<input type="file" id="imp" accept="application/json" style="display:none">
+
+<script>
+const OLD='passaporto_gusto_items_v4';
+const IT={china:'Cina',japan:'Giappone',mexico:'Messico','south-korea':'Corea del Sud',thailand:'Thailandia','united-states':'Stati Uniti','united-kingdom':'Regno Unito',germany:'Germania',france:'Francia',spain:'Spagna',italy:'Italia',turkey:'Turchia',poland:'Polonia',netherlands:'Paesi Bassi',belgium:'Belgio',greece:'Grecia',switzerland:'Svizzera',austria:'Austria',india:'India',vietnam:'Vietnam',taiwan:'Taiwan',indonesia:'Indonesia',malaysia:'Malesia',philippines:'Filippine',brazil:'Brasile',canada:'Canada',australia:'Australia',sweden:'Svezia',morocco:'Marocco',egypt:'Egitto'};
+let P=[],view=[],idx=0,rating=0,photo='',editId=null,qr=null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2400)}
+
+/* ---------- Salvataggio: IndexedDB + copia in localStorage ---------- */
+const DB={open(){return new Promise((ok,ko)=>{const r=indexedDB.open('passaporto-gusto',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)})},
+ async get(){const d=await this.open();return new Promise((ok,ko)=>{const q=d.transaction('kv').objectStore('kv').get('items');q.onsuccess=()=>ok(q.result);q.onerror=()=>ko(q.error)})},
+ async set(v){const d=await this.open();return new Promise((ok,ko)=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,'items');t.oncomplete=ok;t.onerror=()=>ko(t.error)})}};
+async function save(){let ok=false;try{await DB.set(P);ok=true}catch(e){}try{localStorage.setItem(OLD,JSON.stringify(P));ok=true}catch(e){}if(!ok)toast('⚠️ Salvataggio non riuscito: fai un Backup')}
+async function load(){let d;try{d=await DB.get()}catch(e){}
+ if(!Array.isArray(d)){try{d=JSON.parse(localStorage.getItem(OLD))}catch(e){}}
+ P=Array.isArray(d)?d:[];
+ try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}}
+
+/* ---------- Album ---------- */
+function stars(r){return '★'.repeat(r)+'<i>'+'★'.repeat(5-r)+'</i>'}
+function fmt(d){const p=(d||'').split('-');return p.length==3?p[2]+'/'+p[1]+'/'+p[0]:''}
+function filt(){const q=$('#q').value.toLowerCase(),c=$('#fc').value;
+ view=P.filter(p=>(!c||p.country===c)&&(!q||[p.name,p.brand,p.barcode,p.country].some(x=>(x||'').toLowerCase().includes(q))))}
+function countries(){const s=$('#fc'),cur=s.value,l=[...new Set(P.map(p=>p.country).filter(Boolean))].sort();
+ s.innerHTML='<option value="">Tutti i paesi</option>'+l.map(c=>`<option ${c===cur?'selected':''}>${esc(c)}</option>`).join('')}
+function leafProd(p){return `<div class="leaf"><div class="inner">
+ <div class="ph">${p.photo?`<img src="${esc(p.photo)}" alt="" onerror="this.outerHTML='<div class=no>🍘</div>'">`:'<div class="no">🍘</div>'}<div class="stamp">${esc(p.country)}</div></div>
+ ${p.brand?`<p class="brand">${esc(p.brand)}</p>`:''}<h3>${esc(p.name)}</h3><div class="st">${stars(p.rating||0)}</div>
+ <div class="meta">${p.store?`<span>🛍 ${esc(p.store)}</span>`:''}${p.date?`<span>📅 ${fmt(p.date)}</span>`:''}</div>
+ ${p.notes?`<div class="note">${esc(p.notes)}</div>`:''}${p.barcode?`<div class="bc">▮▯▮▮▯ ${esc(p.barcode)}</div>`:''}
+ <div class="act"><button data-e="${p.id}">✏️ Modifica</button><button class="d" data-d="${p.id}">🗑 Elimina</button></div></div></div>`}
+function render(){filt();countries();
+ const fav=P.filter(p=>p.rating>=4).length,n=new Set(P.map(p=>p.country).filter(Boolean)).size;
+ $('#book').innerHTML=`<div class="leaf cover"><div class="inner"><div class="globe">🌍</div><h2>Passaporto<br>del Gusto</h2><p>Gli snack del mondo che ho assaggiato</p>
+ <div class="cs"><div><b>${P.length}</b>prodotti</div><div><b>${n}</b>paesi</div><div><b>${fav}</b>preferiti</div></div>
+ <p class="hint">${P.length?'Scorri per sfogliare ›':'Vai all\'ultima pagina per iniziare ›'}</p></div></div>`
+ +view.map(leafProd).join('')
+ +`<div class="leaf"><div class="addp"><p style="font-weight:700;font-size:18px">Pagina libera</p><p style="color:var(--mute);font-size:14px">Scansiona un codice a barre o scrivi tu il prodotto.</p><button data-a="1">+</button></div></div>`;
+ idx=Math.min(idx,view.length+1);layout(true)}
+function layout(instant){const b=$('#book'),L=[...b.children],n=L.length;
+ if(instant)b.classList.add('noanim');
+ L.forEach((l,i)=>{l.classList.toggle('fl',i<idx);l.style.zIndex=i<idx?i:n-i});
+ if(instant){void b.offsetWidth;b.classList.remove('noanim')}
+ $('#ind').textContent=idx==0?'Copertina':idx==n-1?'Pagina libera':idx+' / '+view.length;
+ $('#pv').disabled=idx==0;$('#nx').disabled=idx==n-1}
+function go(d){const n=view.length+2;const t=Math.max(0,Math.min(n-1,idx+d));if(t!=idx){idx=t;layout(false);if(navigator.vibrate)navigator.vibrate(8)}}
+
+/* ---------- Form ---------- */
+function setRating(r){rating=r;[...$('#stars').children].forEach((b,i)=>b.classList.toggle('on',i<r))}
+$('#stars').innerHTML=[1,2,3,4,5].map(i=>`<button type="button" data-r="${i}">★</button>`).join('');
+$('#stars').onclick=e=>{const r=e.target.dataset.r;if(r)setRating(+r==rating?0:+r)};
+function setPhoto(u){photo=u||'';const i=$('#prev');i.src=photo;i.style.display=photo?'block':'none'}
+function openForm(p){editId=p?p.id:null;$('#ft').textContent=p?'Modifica prodotto':'Nuovo prodotto';
+ $('#bc').value=p?p.barcode||'':'';$('#nm').value=p?p.name:'';$('#br').value=p?p.brand||'':'';$('#co').value=p?p.country:'';
+ $('#sr').value=p?p.store||'':'';$('#dt').value=p?p.date||'':new Date().toISOString().slice(0,10);$('#nt').value=p?p.notes||'':'';
+ $('#pf').value='';setPhoto(p?p.photo:'');setRating(p?p.rating||0:0);$('#bst').textContent='';$('#res').innerHTML='';$('#m-form').classList.add('on')}
+function shrink(src){return new Promise(ok=>{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');
+ c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);try{ok(c.toDataURL('image/jpeg',.8))}catch(e){ok(null)}};im.onerror=()=>ok(null);im.src=src})}
+$('#pf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>setPhoto(await shrink(r.result)||r.result);r.readAsDataURL(f)};
+$('#fs').onclick=async()=>{const nm=$('#nm').value.trim(),co=$('#co').value.trim();if(!nm||!co)return toast('Servono nome e paese');
+ const o={name:nm,brand:$('#br').value.trim(),country:co,store:$('#sr').value.trim(),date:$('#dt').value,rating,photo,notes:$('#nt').value.trim(),barcode:$('#bc').value.replace(/\D/g,'')};
+ if(editId){const i=P.findIndex(p=>p.id===editId);P[i]={...P[i],...o}}else{o.id='p'+Date.now();P.unshift(o);idx=1}
+ await save();$('#m-form').classList.remove('on');render();toast(editId?'Pagina aggiornata':'Pagina aggiunta all\'album')};
+$('#fx').onclick=()=>$('#m-form').classList.remove('on');
+
+/* ---------- Codice a barre ---------- */
+const rc=c=>{try{return c&&c.length==2?new Intl.DisplayNames(['it'],{type:'region'}).of(c.toUpperCase()):''}catch(e){return ''}};
+async function byName(){const q=$('#nm').value.trim(),R=$('#res');if(q.length<2){toast('Scrivi almeno 2 lettere del nome');return}
+ R.innerHTML='<small>Cerco…</small>';let L=[];
+ try{const r=await fetch('https://world.openfoodfacts.org/cgi/search.pl?search_simple=1&action=process&json=1&page_size=15&search_terms='+encodeURIComponent(q)+'&fields=code,product_name,product_name_it,brands,origins,countries_tags,image_front_small_url,image_front_url');const d=await r.json();
+  L=(d.products||[]).filter(p=>p.product_name||p.product_name_it).map(p=>{const t=((p.countries_tags||[])[0]||'').replace('en:','');return{code:p.code,name:p.product_name_it||p.product_name,brand:(p.brands||'').split(',')[0].trim(),co:(p.origins||'').split(',')[0].trim()||IT[t]||t.replace(/-/g,' ').replace(/^./,x=>x.toUpperCase()),img:p.image_front_url,th:p.image_front_small_url||p.image_front_url}})}catch(e){}
+ const K=localStorage.getItem('ean_key');
+ if(K){try{const r=await fetch('https://api.ean-search.org/api?token='+encodeURIComponent(K)+'&op=product-search&format=json&name='+encodeURIComponent(q));const d=await r.json();(d.productlist||[]).slice(0,10).forEach(i=>L.push({code:i.ean,name:i.name,brand:'',co:rc(i.issuingCountry),img:'',th:''}))}catch(e){}}
+ window._L=L;
+ R.innerHTML=L.length?L.map((x,i)=>`<button type="button" data-i="${i}"><img src="${esc(x.th||'')}" alt=""><span><b>${esc(x.name)}</b><small>${esc([x.brand,x.co,x.code].filter(Boolean).join(' · '))}</small></span></button>`).join(''):'<small>Nessun risultato. Prova un nome più corto o in inglese, oppure compila a mano.</small>'}
+$('#byname').onclick=byName;
+$('#nm').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();byName()}});
+$('#res').onclick=async e=>{const b=e.target.closest('button');if(!b)return;const x=window._L[+b.dataset.i];
+ $('#nm').value=x.name;if(x.brand)$('#br').value=x.brand;if(x.co)$('#co').value=x.co;if(x.code)$('#bc').value=x.code;
+ $('#res').innerHTML='';const u=x.img||x.th;if(u)setPhoto(await shrink(u)||u);toast('Dati compilati: controlla e salva')};
+$('#key').onclick=()=>{const k=prompt('Incolla la chiave (token) di EAN-Search. Lascia vuoto per toglierla.',localStorage.getItem('ean_key')||'');if(k===null)return;
+ k.trim()?localStorage.setItem('ean_key',k.trim()):localStorage.removeItem('ean_key');toast(k.trim()?'Chiave salvata':'Chiave rimossa')};
+async function fillFrom(nm,br,co,u){if(nm)$('#nm').value=nm;if(br)$('#br').value=br;if(co&&!$('#co').value)$('#co').value=co;if(u)setPhoto(await shrink(u)||u)}
+async function lookup(){const raw=$('#bc').value.replace(/\D/g,''),st=$('#bst');if(!raw){st.style.color='#a33';st.textContent='Scrivi o scansiona un codice.';return}
+ st.style.color='#555';st.textContent='Cerco il prodotto…';
+ const codes=[...new Set([raw,raw.padStart(13,'0'),raw.replace(/^0+/,'')])].filter(Boolean);
+ const F='product_name,product_name_it,generic_name,brands,origins,manufacturing_places,countries_tags,image_front_url,image_url';
+ let net=false;
+ for(const h of ['world.openfoodfacts.org','world.openproductsfacts.org','world.openbeautyfacts.org']){
+  for(const c of codes){try{const r=await fetch('https://'+h+'/api/v2/product/'+c+'.json?fields='+F);const d=await r.json();net=true;
+   if(d.status===1&&d.product){const p=d.product,t=((p.countries_tags||[])[0]||'').replace('en:','');
+    const co=(p.origins||p.manufacturing_places||'').split(',')[0].trim()||IT[t]||t.replace(/-/g,' ').replace(/^./,x=>x.toUpperCase());
+    await fillFrom(p.product_name_it||p.product_name||p.generic_name||'',(p.brands||'').split(',')[0].trim(),co,p.image_front_url||p.image_url);
+    st.style.color='#2f6b3f';st.textContent='✅ Trovato! Controlla i dati e salva.';return}}catch(e){}}}
+ const K=localStorage.getItem('ean_key');
+ if(K){try{const r=await fetch('https://api.ean-search.org/api?token='+encodeURIComponent(K)+'&op=barcode-lookup&format=json&ean='+raw.padStart(13,'0'));const d=await r.json();net=true;const i=Array.isArray(d)?d[0]:null;
+  if(i&&i.name){await fillFrom(i.name,'',rc(i.issuingCountry));st.style.color='#2f6b3f';st.textContent='✅ Trovato su EAN-Search! Aggiungi la foto se serve.';return}}catch(e){}}
+ try{const r=await fetch('https://api.upcitemdb.com/prod/trial/lookup?upc='+raw);const d=await r.json();net=true;const i=d.items&&d.items[0];
+  if(i){await fillFrom(i.title||'',i.brand||'','',(i.images||[])[0]);st.style.color='#2f6b3f';st.textContent='✅ Trovato (paese da inserire a mano).';return}}catch(e){}
+ st.style.color='#a33';
+ st.textContent=net?'Codice '+raw+' non presente nei database: compila a mano e scatta una foto. Il codice resta salvato.':'Nessuna connessione ai database: controlla internet e riprova.'}
+$('#look').onclick=lookup;
+$('#scan').onclick=async()=>{$('#m-scan').classList.add('on');
+ try{const F=window.Html5QrcodeSupportedFormats;
+  qr=qr||new Html5Qrcode('reader',{formatsToSupport:F?[F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128,F.CODE_39]:undefined,experimentalFeatures:{useBarCodeDetectorIfSupported:true}});
+  await qr.start({facingMode:'environment'},{fps:10,qrbox:{width:260,height:140}},t=>{if(navigator.vibrate)navigator.vibrate(80);$('#bc').value=t;closeScan().then(lookup)},()=>{})
+ }catch(e){$('#m-scan').classList.remove('on');toast('Fotocamera non disponibile: controlla i permessi')}};
+async function closeScan(){try{if(qr&&qr.isScanning)await qr.stop()}catch(e){}$('#m-scan').classList.remove('on')}
+$('#sx').onclick=closeScan;
+
+/* ---------- Backup ---------- */
+$('#bk').onclick=()=>{if(!P.length&&!confirm('Album vuoto. Vuoi importare un backup?'))return;
+ if(P.length&&confirm('OK = scarica backup\nAnnulla = importa un backup')){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(P)],{type:'application/json'}));a.download='passaporto-del-gusto.json';a.click()}else $('#imp').click()};
+$('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d))throw 0;
+ const ids=new Set(P.map(p=>p.id));d.forEach(p=>{if(p&&p.name&&!ids.has(p.id))P.push(p)});await save();render();toast('Backup importato')}catch(x){toast('File non valido')}};r.readAsText(f);e.target.value=''};
+
+/* ---------- Eventi ---------- */
+$('#book').onclick=e=>{const t=e.target.closest('button');if(!t)return;
+ if(t.dataset.a)openForm();
+ else if(t.dataset.e)openForm(P.find(p=>p.id===t.dataset.e));
+ else if(t.dataset.d&&confirm('Eliminare questa pagina dall\'album?')){P=P.filter(p=>p.id!==t.dataset.d);save().then(()=>{render();toast('Pagina eliminata')})}};
+$('#addtop').onclick=()=>openForm();
+$('#pv').onclick=()=>go(-1);$('#nx').onclick=()=>go(1);
+$('#q').oninput=$('#fc').onchange=()=>{idx=0;render()};
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1)});
+let sx=0,sy=0;const stg=$('#stage');
+stg.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+stg.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)go(dx<0?1:-1)},{passive:true});
+load().then(render);
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
